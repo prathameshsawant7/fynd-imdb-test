@@ -1,0 +1,24 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "===2.4.1"
+flask-marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+psycopg2 = "==2.8.4"
+flask-migrate = "==2.5.2"
+flask-script = "==2.0.6"
+sqlalchemy = "*"
+passlib = "==1.7.2"
+werkzeug = "==1.0.1"
+pyjwt = "==1.7.1"
+gunicorn = "==20.0.4"
+flask-mysqldb = "==0.2.0"
+
+[requires]
+python_version = "3.6"
