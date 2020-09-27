@@ -8,33 +8,34 @@ from sqlalchemy.types import Binary
 from sqlalchemy.dialects.mysql import FLOAT
 from sqlalchemy.ext.declarative import declarative_base
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import (TimedJSONWebSignatureSerializer
-                          as Serializer, BadSignature, SignatureExpired)
-
-
-class UUID(types.TypeDecorator):
-    impl = Binary
-    def __init__(self):
-        self.impl.length = 16
-        types.TypeDecorator.__init__(self, length=self.impl.length)
-
-    def process_bind_param(self,value,dialect=None):
-        if value and isinstance(value, uuid.UUID):
-            return value.bytes
-        elif value and not isinstance(value,uuid.UUID):
-            print('Value %s is not a valid uuid.UUID' % value)
-        else:
-            return None
-
-    def process_result_value(self, value, dialect=None):
-        if value:
-            return uuid.UUID(bytes=value)
-        else:
-            return None
-
-    def is_mutable(self):
-        return False
-
+from datetime import datetime
+# from itsdangerous import (TimedJSONWebSignatureSerializer
+#                           as Serializer, BadSignature, SignatureExpired)
+#
+#
+# class UUID(types.TypeDecorator):
+#     impl = Binary
+#     def __init__(self):
+#         self.impl.length = 16
+#         types.TypeDecorator.__init__(self, length=self.impl.length)
+#
+#     def process_bind_param(self,value,dialect=None):
+#         if value and isinstance(value, uuid.UUID):
+#             return value.bytes
+#         elif value and not isinstance(value,uuid.UUID):
+#             print('Value %s is not a valid uuid.UUID' % value)
+#         else:
+#             return None
+#
+#     def process_result_value(self, value, dialect=None):
+#         if value:
+#             return uuid.UUID(bytes=value)
+#         else:
+#             return None
+#
+#     def is_mutable(self):
+#         return False
+#
 
 Base = declarative_base()
 
@@ -75,7 +76,7 @@ class AdminUsers(db.Model):
     name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False)
     password = db.Column(db.Text, nullable=False, default="")
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.DateTime, default=datetime.now())
 
     def __init__(self, name, email, password):
         self.name = name
@@ -122,8 +123,8 @@ class Movies(db.Model):
     views = db.Column(db.Integer, default=0)
     created_by = db.Column(GUID(), db.ForeignKey('admin_users.id'))
     updated_by = db.Column(GUID(), db.ForeignKey('admin_users.id'))
-    created_at = db.Column(db.DateTime, server_default=db.func.now())
-    updated_at = db.Column(db.DateTime, server_default=db.func.now())
+    created_at = db.Column(db.DateTime, default=datetime.now())
+    updated_at = db.Column(db.DateTime, default=datetime.now())
 
     def __init__(self, name, director, popularity, genre, imdb_score, created_by, views=0, updated_by=None):
         self.name = name
@@ -138,7 +139,7 @@ class Movies(db.Model):
     def serialize(self):
         """Return object data in easily serializable format"""
         return {
-            'id': self.id,
+            'id': str(self.id),
             'name': self.name,
             'director': self.director,
             '99popularity':self.popularity,
@@ -161,7 +162,7 @@ class BlacklistToken(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token = db.Column(db.String(500), unique=True, nullable=False)
-    blacklisted_on = db.Column(db.DateTime, server_default=db.func.now())
+    blacklisted_on = db.Column(db.DateTime, default=datetime.now())
 
     def __init__(self, token):
         self.token = token
